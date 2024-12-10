@@ -14,12 +14,12 @@ void replaceNewlines(char saved[ROW][COL], int rows);
 void finalize(char saved[ROW][COL], char final[], int rows);
 void print(char final[]);
 int main(){
-	char saved[ROW][COL];
-    char final[ROW*COL];
-	int row_count=0,debug=0;
-	FILE *fp1;
- 	fp1=fopen(INPUT_FILE,"r");
-   	if(fp1==NULL){
+   char saved[ROW][COL];
+   char final[ROW*COL];
+   int row_count=0,debug=0;
+   FILE *fp1;
+   fp1=fopen(INPUT_FILE,"r");
+   if(fp1==NULL){
     	printf("failed to find file");
     	return 1;
    }
