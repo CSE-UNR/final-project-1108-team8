@@ -1,41 +1,37 @@
 //Author: Caitlyn Aurand, Loghan Flanders, Ava Jones
-//Date: 12/3/24
+//Date: 12/10/24
 //Purpose: create a madlibs game 
 
 #include <stdio.h>
-#define INPUT_FILE "madlib3.txt"
+#define INPUT_FILE "madlib2.txt"
 #define ROW 100
 #define COL 1000
 
-void char_count(FILE *input,char saved[ROW][COL],int* rows);
-void scrubber(char saved[ROW][COL],int rows);
+void readFile(FILE *input,char saved[ROW][COL],int* rows);
 void promptUser(char saved[ROW][COL], int rows);
 int getWord(char buffer[], char type);
-void addTrailingSpace(char buffer[]);
-void addLeadingSpace(char buffer[]);
 void replaceNewlines(char saved[ROW][COL], int rows);
+void finalize(char saved[ROW][COL], char final[], int rows);
+void print(char final[]);
 int main(){
 	char saved[ROW][COL];
-	int letters=0,debug=0;
+    char final[ROW*COL];
+	int row_count=0,debug=0;
 	FILE *fp1;
  	fp1=fopen(INPUT_FILE,"r");
    	if(fp1==NULL){
     	printf("failed to find file");
     	return 1;
    }
-   char_count(fp1,saved,&letters);
-    // while(debug<20){
-	// 	printf("%s\n",saved[debug]);
-	// 	debug++;
-	// }
+   readFile(fp1,saved,&row_count);
    fclose(fp1);
-   //printf("%d\n",letters);
-   promptUser(saved, letters);
-   replaceNewlines(saved, letters);
-   scrubber(saved,letters);
+   promptUser(saved, row_count);
+   replaceNewlines(saved, row_count);
+   finalize(saved, final, row_count);
+   print(final);
 	return 0;
 }
-void char_count(FILE *input,char saved[ROW][COL],int* rows){
+void readFile(FILE *input,char saved[ROW][COL],int* rows){
 	int count_rows=0;
 	while(fgets(saved[count_rows],COL,input) != NULL){
 		count_rows++;
@@ -54,21 +50,15 @@ int getWord(char buffer[], char type){
     switch(type){
         case 'A': 
             printf("Please enter an adjective:\n");
-            scanf(" %s", buffer);
-            addTrailingSpace(buffer);
-            addLeadingSpace(buffer);
+            scanf("%s", buffer);
         break;
         case 'N': 
             printf("Please enter a noun:\n");
-            scanf(" %s", buffer);
-            addTrailingSpace(buffer);
-            addLeadingSpace(buffer);
+            scanf("%s", buffer);
         break;
         case 'V': 
             printf("Please enter a verb:\n");
-            scanf(" %s ", buffer);
-            addTrailingSpace(buffer);
-            addLeadingSpace(buffer);
+            scanf("%s", buffer);
         break;
     }
     return done;
@@ -76,31 +66,32 @@ int getWord(char buffer[], char type){
 void replaceNewlines(char saved[ROW][COL], int rows){
     for(int i=0;i<rows;i++){
 		for(int j=0;j<COL;j++){
+            //when fgets reads in a line it stores "\n" and then "\0"
             if(saved[i][j] == '\n'){
                 saved[i][j] = '\0';
+                break;
             }
         }
     }
 }
-void scrubber(char saved[ROW][COL],int rows){
-	for(int i=0;i<rows;i++){
-	    printf("%s",saved[i]);
-	}
-}
-void addTrailingSpace(char buffer[]){
-    int i;
-    for(i = 0; buffer[i] != '\0'; i++){}
-    buffer[i] = ' ';
-    buffer[i+1] = '\0';
-}
-void addLeadingSpace(char buffer[]){
-    int i = 0;
-    while(buffer[i] != '\0'){
-        i++;
+void finalize(char saved[ROW][COL], char final[], int rows){
+    int cursor = 0;
+    for(int i=0;i<rows;i++){
+        int j = 0;
+        if(i != 0 && !(saved[i][j] == '.' || saved[i][j] == '!' || saved[i][j] == '?')){
+            final[cursor++] = ' ';
+        }
+	    while(saved[i][j]!='\0'){
+            final[cursor++] = saved[i][j];
+            j++;
+        }
     }
-    while(i >= 0){
-        buffer[i + 1] = buffer[i];
-        i--;
+    final[cursor] = '\0';
+}
+void print(char final[]){
+    int cursor = 0;
+    while(final[cursor]!='\0'){
+        printf("%c", final[cursor++]);
     }
-    buffer[0] = ' ';
+    printf("\n");
 }
